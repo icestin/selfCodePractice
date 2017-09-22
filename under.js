@@ -473,7 +473,75 @@
     _.rest=_.tail=_.drop=function(array,n,guard){
         return slice.call(array,n===null||guard?1:n);
     };
+    
+    /**
+     * 提取数组中为真的值
+     */
+    _.compact=function(array){
+        return _.filter(array,_.identity);
+    }
+    /**
+     * 递归展平数组函数
+     */
+    var flatten=function(input,shallow,strict,startIndex){
+        var output=[],idx=0,value;
+        for(var i=startIndex||0,length=input&&input.length;i<length;i++){
+            value=input[i];
+            if(value&&value.length>=0&&(_.isArray(value)||_.isArguments(value))){
+                //展平当前级别的数组 或者是参数数组
+                if(!shallow) value=flatten(value,shallow,strict);
+                var j=0,len=value.length;
+                output.length+=len;
+                while(j<len){
+                    output[idx++]=value[j++]
+                }
+            }else if(!strict){
+                output[index++]=value;
+            }
+        }
+        return output;
+    };
+    _.flatten=function(array,shallow){
+        return flatten(array,shallow,false);
+    };
+    /**
+     * 返回不包含指定值的数组
+     */
+    _.without=function(array){
+        return _.difference(array,slice.call(arguments,1));
+    }
+    /**
+     * 生成重复的数组
+     */
+    _.uniq=_.unique=function(array,isSorted,iteratee,context){
+        if(array===null) return [];
+        if(!_.isBoolean(isSorted)){
+            context=iteratee;
+            iteratee=isSorted;
+            isSorted=false;
+        }
+        if(iteratee!=null)iteratee=cb(iteratee,context);
+        var result=[];
+        var seen=[];
+        for(var i=0,length=array.length;i<length;i++){
+            var value=array[i],
+                computed=iteratee?iteratee(value,i,array):value;
+            if(isSorted){
+                if(!i||seen!==computed) result.push(value);
+                seen=computed;
+            }else if(iteratee){
+                if(!_.contains(seen,computed)){
+                    seen.push(computed);
+                    result.push(value);
+                }
+            }else if(!_.contains(result,value)){
+                result.push(value);
+            }
+        }
+        return result;
+    }
 
 
+    
 
 }.call(this));
