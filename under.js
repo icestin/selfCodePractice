@@ -481,7 +481,7 @@
         return _.filter(array,_.identity);
     }
     /**
-     * 递归展平数组函数
+     * 将一个嵌套多层的数组转换为只有一层的数组
      */
     var flatten=function(input,shallow,strict,startIndex){
         var output=[],idx=0,value;
@@ -511,7 +511,9 @@
         return _.difference(array,slice.call(arguments,1));
     }
     /**
-     * 生成重复的数组
+     * 返回 array去重后的副本, 使用 === 做相等测试.
+     *  如果您确定 array 已经排序, 那么给 isSorted 参数传递 true值, 此函数将运行的更快的算法.
+     *  如果要处理对象元素, 传参 iterator 来获取要对比的属性.
      */
     _.uniq=_.unique=function(array,isSorted,iteratee,context){
         if(array===null) return [];
@@ -540,6 +542,163 @@
         }
         return result;
     }
+
+    /**
+     * 返回传入数组的并集 返回数组元素是唯一的
+     */
+    _.union=function(){
+        return _.uniq(flatten(arguments,true,true));
+    }
+
+    /**
+     * 返回传入数组的交集，结果中的每个值都存在于传入的每个数组中
+     */
+    _.intersection=function(array){
+        if(array===null) return [];
+        var result=[];
+        var argsLength=arguments.length;
+        for(var i=0,length=array.length;i<length;i++){
+            var item=array[i];
+            if(_.contains[result,item]) continue;
+            for(var j=1;j<argsLength;j++){
+                if(!_.contains(arguments[j],item)) break;
+            }
+            if(j===argsLength) result.push(item);
+        }
+        return result;
+    };
+     /**
+      * 类似于 without 返回的值来源于 array数组，并且不存在于第二个参数数组中
+      */
+    _.difference=function(array){
+       var rest=flatten(arguments,true,true,1);
+       return _.filter(array,function(value){
+           return !_.contains(rest,value);
+       });
+    }
+
+    /**
+     * 将每个array中相应位置的值合并在一起 在合并分开保存的数据很有用
+     * 如果处理矩阵嵌套数组时，_.zip.apply()可以做类似的效果
+     */
+    _.zip=function(array){
+        if(array===null) return [];
+        var length=_.max(arguments,'length').length;
+        var results=Array(length);
+        while(length-- >0){
+            results[length]=_.pluck(arguments,length);
+        }
+        return results;
+    };
+
+    _.unzip=function(array){
+        return _.zip.apply(null,array);
+    }
+
+    /**
+     * 将数组转变成对象
+     * 传递任何一个独立[key,value]对的列表，
+     * 或者一个键的列表和一个值列表
+     * 如果存在重复键 最后一个值将被返回
+     */
+    _.object=function(list,values){
+       if(list===null) return {};
+       var result={};
+       for(var i=0,length=list.length;i<length;i++){
+           if(values){
+               result[list[i]]=values[i];
+           }else{
+               result[list[i][0]]=list[i][1];
+           }
+       }
+       return result;
+    };
+
+    _.indexOf=function(array,item,isSorted){
+        var i=0,length=array&&array.length;
+        if(typeof isSorted==='number'){
+            i=isSorted<0?Math.max(0,length+isSorted):isSorted;
+        }else if(isSorted&&length){
+            i=_.sortedIndex(array,item);
+            return array[i]===item?i:-1;
+        }
+        for(;i<length;i++){
+         if(array[i]===item) return i; 
+       }
+       return -1;
+    };
+    _.lastIndexOf=function(array,item,from){
+        var idx=array?array.length:0;
+        if(typeof from==='number'){
+            idx=form<0?idx+from+1:Math.min(idx,from+1);
+        }
+        while(--idx >=0) if(array[idx]===item) return idx;
+        return -1;
+    };
+    _.findIndex=function(array,predicate,context){
+        predicate=cb(predicate,context);
+        var length=array!=null?array.length:0;
+        for(var i=0;i<length;i++){
+            if(predicate(array[i],i,array)) return i;
+        }
+        return -1;
+    };
+    /*** 
+     * 使用二分查找确定value在list中的位置号
+     * value按此序列号插入能保持list原有的排序
+     * 如果传入 iteratee函数,iterator将作为排序的依据，包括你传递的value
+     * 也可以是字符串的属性名排序
+     */
+    _.sortedIndex=function(array,obj,iteratee,context){
+       iteratee=cb(iteratee,context,1);
+       var value=iteratee(obj);
+       var low=0,high=array.length;
+       while(low<high){
+           var  mid=Math.floor((low+height)/2);
+           if(_.comparator(iteratee(array[mid]),value)<0) low=mid+1;
+           else hight=mid;
+       }
+       return low;
+    }
+    /**
+     * 一个用来创建灵活编号的列表函数
+     * 省略start 则默认为0；
+     * step 默认为1
+     * 返回一个从start到stop的整数列表
+     * 用step来增加或减少
+     */
+    _.range=function(start,stop,step){
+        if(arguments.length<=1){
+            stop=start||0;
+            start=0;
+        }
+        step=step||1;
+        var length=Math.max(Math.ceil((stop-start)/step),0);
+        var range=Array(length);
+        for(var idx=0;idx<length;idx++,start+=step){
+            range[idx]=start;
+        }
+        return range;
+    };
+
+    /**
+     * 函数功能
+     * 
+     */
+    
+     /**
+      *根据输入参数确定函数是否是构造函数还是普通函数，
+      */
+    var  executeBound=function(sourceFunc,boundFunc,context,callingContext,args){
+  
+    }
+
+    
+
+
+    
+
+
 
 
     
