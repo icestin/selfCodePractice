@@ -687,18 +687,446 @@
      */
     
      /**
-      *根据输入参数确定函数是否是构造函数还是普通函数，
+      *根据输入参数确定函数是否是构造函数还是带参普通函数，
       */
     var  executeBound=function(sourceFunc,boundFunc,context,callingContext,args){
-  
+      if(!(callingContext instanceof boundFunc)) return sourceFunc.apply(context,args);
+       var  self=baseCreate(sourceFunc.prototype);
+       var  reslut=sourceFunc.apply(self,args);
+       if(_.isObject(result)) return result;
+       return self;
+    };
+
+    /**
+     * 将一个函数绑定到指定的对象 this arguments 
+     * 无论何时调用函数 函数的this都指向这个objectt 
+     * 任意可选参数指定给该function,可以填充函数所需要的参数
+     */
+    _.bind=function(func,context){
+        if(nativeBind && func.bind===nativeBind) return nativeBind.bind(func,slice.call(arguments,1));
+        if(!_.isFunction(func)) throw new TypeError('绑定必须发生在函数上');
+        var args=slice.call(arguments,2);
+        return function bound(){
+            return executedBound(func,bound,context,this,args.concat(slice.call(arguments)));
+        };
+    };
+   /**
+    * 部分应用函数 或者偏函数应用
+    * 它接收一定数目的参数，绑定值到一个或多个这些参数，并返回一个新的函数，
+    返回的函数只接收剩余未绑定的值的参数。
+    */
+    _.partial=function(func){
+        var boundArgs=slice.call(arguments,1);
+        return function bound(){
+            var position=0;
+            var args=boundArgs.slice();
+            for(var i=0,length=args.length;i<length;i++){
+                if(args[i]===_) args[i]=arguments[position++];
+            }
+            while(position<arguments.length) args.push(arguments[position++]);
+            return executedBound(func,bound,this,this,args);            
+        };
+    };
+    /**
+     * 把methodNames参数指定的一些方法绑定到object上，这些方法会在对象的上下文环境中执行。
+     * 绑定函数作用事件处理函数时非常便利，否则函数被调用时this没有用
+     * methodNames参数是必须的
+     */
+    _.bindAll=function(obj/*methodNames*/){
+        var i,length=arguments.length,key;
+        if(length<=1) throw new Error('bingAll must be passed funcion names');
+        for(i=1;i<length;i++){
+            key=arguments[i];
+            obj[key]=_.bind(obj[key],obj);
+        }
+        return obj;
+    };
+    /**
+     * 可以缓存某函数的计算结果 对于耗时较长的计算比较有帮助
+     *  如果传入了hasher参数，就用hasher的返回值作为key存储函数的计算结果
+     */
+    _.memoize=function(func,hasher){
+        var memoize=function(key){
+            var cache=memoize.cache;
+            var address=''+(haser?haser.apply(this,arguments):key);
+            if(!_.has(cache,address)) cache[address]=func.apply(this,arguments);
+            return cache[address];
+        };
+        memoize.cache={};
+        return memoize;
+    };
+
+    /**
+     * 类似于setTimeout，等待wait毫米候调用function.
+     * 如果调用arguments 当函数function执行时，arguments会作为参数传入
+     */
+    _.delay=function(func,wait/**arguments*/){
+        var  args=slice.call(arguments,2);
+        return setTimeout(function(){
+          return func.apply(null,args);
+         },wait);
+    };
+    
+    _.defer=_.partial(_.delay,_,1);
+    /**
+     * 创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每个wait毫秒调用一次该函数
+     * 应用于想控制一些触发频率较高的事件
+     * 返回一个函数 该函数在给定的时间内最多只会触发一次
+     * 
+     * 所以说，underscore 的函数节流有三种调用方式，默认的（有头有尾），
+     * 设置 {leading: false} 的 事件开始不执行，以及设置 {trailing: false}事件结束时不执行。
+     * 按频率执行调用 
+     * 例如 游戏中的按键响应 格斗 射击 簇拥so控制出拳和射击的速率
+     *    自动完成 按照一定频率分析输入 提示自动完成
+     * 鼠标移动和窗口滚动 需要控制回调发生的频率
+     */
+    _.throttle=function(func,wait,options){
+       var context,args,result;//缓存func执行所需要的上下文，result缓存func执行结果
+       var timeout=null; //timeout标识最近一次被追踪的调用 最近一次
+       var previous=0; //标记时间戳 上一次执行回调的时间戳 最后一次func调用的时间点
+       if(!options) options={};
+       /**
+        * 创建一个掩护执行的函数包裹住func的执行
+        */
+       var later=function(){
+           //执行时 刷新最近一次调用的时间
+           previous=options.leading===false?0:_.now();
+           //清空为此次执行设置的定时器 
+           timeout=null;
+           result=func.apply(context,args);
+           if(!timeout) context=args=null;
+       };
+       //返回一个节流化后的函数
+       return function(){
+           //尝试调用func时，会首先记录当前时间戳
+           var now=_.now();
+           //是否第一次调用
+           if(!previous&&options.length.leading===false) previous=now;
+           //func还要等待多久才能调用 
+           var remaining=wait-(now-previous);
+           //记录执行时需要的上下文和参数
+           context=this;
+           args=arguments;
+           //如果计算后能立即执行
+           if(remaining<=0||remaining>wait){ //remaining>wait 等同于 now<previous
+               //清除之前的设置的延时执行，就不存在某些回调一同发生的情况
+               if(timeout){
+                   clearTimeout(timeout);
+                   timeout=null;
+               }
+               //刷新最近一次调用用func调用的时间点
+               previous=now;
+               //执行func调用
+               result=func.apply(context,args);
+               /**
+                * 再次检查timeout，因为func执行期间可能有新的timeout被设置，
+                如果 timeout被清空了，代表不再有等待执行的func 也清空context 和args
+                */
+               if(!timeout) context=args=null;
+           }else if(!timeout && options.trailing!==false){
+               //如果设置了trailing 那么暂缓此次调用尝试的执行
+               timeout=setTimeout(later,remaining);
+           }
+           return result;
+       }
+    };
+     /**
+      * 防反跳 就是不在跳起，不再响应的意思
+      immediate true 可以执行时立即执行
+                false  可以执行时也必须延后至少 wait毫秒后执行
+      * 高频下只响应一次   Ajax多数场景下 每个异步请求再多时间内只能响应一次 
+      比如 下拉刷新 但只发送一次ajax请求
+      */
+    _.debounce=function(func,wait,immediate){
+       var timeout,args,context,timestamp,result;
+        
+       var later=function(){
+           var last=_.now()-timestamp;
+           if(last<wait && last>=0){
+               timeout=setTimeout(later,wait-last);
+           }else{
+               timeout=null;
+               if(!immediate){
+                   result=func.apply(context,args);
+                   if(!timeout) context=args=null;
+               }
+           }
+       };
+       return function(){
+           context=this;
+           args=arguments;
+           timestamp=_.now();
+           var  callNow=immediate&&!timeout;
+           if(!timeout) timeout=setTimeout(later,wait);
+           if(callNow){
+               result=func.apply(context,args);
+               context=args=null;
+           }
+           return result;
+       };
+    };
+   /**
+    * 将第一个函数func封装在wrapper里边，并把func作为第一个参数传递给wrapper
+    * 这样可以让wrapper在function运行之前和之后之后执行代码
+    */
+    _.wrap=function(func,wrapper){
+        return _.partial(wrapper,func);
+    };
+    /**
+     * 返回一个新的predicate函数否定版本
+     */
+    _.negate=function(predicate){
+        return function(){
+            return !predicate.apply(this,arguments);
+        }
     }
+    /**
+     * 返回函数集合functions组合后的复合函数即 一个函数执行完之后把返回的结果再作为参数赋值给下一个函数来执行
+     * 例如  在数学中 f(),g(),和h()组合起来可以得到复合函数放f(g(h()))
+     */
+    _.compose=function(){
+        var args=arguments;
+        var start=args.length-1;
+        return function(){
+            var i=start;
+            var result=args[start].apply(this,arguments);
+            while(i--) result=args[i].call(this,result);
+            return result;
+        };
+    };
+     /**
+      *  创建一个函数 只有在运行了times次后才有效果，在处理同组异步请求返回结果时如果要确保同组理所有
+      异步请求组里所有的异步请求完成之后才执行这个函数
+      */
+    _.after=function(times,func){
+        return function(){
+            if(--times<1){
+                return func.apply(this,arguments);
+            }
+        };
+    };
+    /**
+     *  创建一个函数 调用不超过times 当count已经到达时 最后一个函数调用结果被记住并返回
+     */
+    _.before=function(times,func){
+        var  memo;
+        return function(){
+            if(--times>0){
+                memo=func.apply(this,arguments);
+            }
+            if(times<=1) func=null;
+            return memo;
+        };
+    };
+
+    /**
+     * 返回一个函数 最多只执行一次
+     */
+    _.once=_.partial(_.before,2);
 
     
+/*******
+ * 对象方法
+ */
+    var hasEnumBug=!{toString:null}.propertyIsEnumerable('toString');
+    var nonEnumerableProps=['construtor','valueOf','isPrototypeOf','toString','propertyIsEnumerable','hasOwnProperty','toLocaleString'];
+    function collectNonEnumProps(obj,keys){
+      var nonEnumIdx=nonEnumerableProps.length;
+      var proto=typeof obj.constructor==='function'?FuncProto:ObjProto;
+      while(nonEnumIdx--){
+          var prop=nonEnumerableProps[nonEnumIdx];
+          if(prop==='constructor' ?_.has(obj,prop):prop in obj&&obj[prop]!==proto[prop]&&!_.contains(keys,prop)){
+        keys.push(prop);
+        }
+      }
+    };
 
-
+    _.keys=function(obj){
+        if(!_.isObject(obj)) return [];
+        if(nativeKeys) return nativeKeys(obj);
+        var  keys=[];
+        for(var key in obj) if(_.has(obj,key)) keys.push(key);
+        if(hasEnumBug) collectNonEnumprops(obj,keys);
+        return keys;
+    };
+    _.keysIn=function(obj){
+        if(!_.isObject(obj)) return [];
+        var keys=[];
+        for(var key in obj) keys.push(key);
+        if(hasEnumBug) collectNonEnumProps(obj,keys);
+        return keys;
+    };
+    _.value=function(obj){
+        var keys=_.keys(obj);
+        var length=keys.length;
+        var values=Array(length);
+        for(var i=0;i<length;i++){
+            values[i]=obj[keys[i]];
+        }
+        return values;
+    };
+    _.pairs=function(obj){
+        var keys=_.keys(obj);
+        var length=keys.length;
+        var pairs=Array(length);
+        for(var i=0;i<length;i++) {
+            pairs[i]=[keys[i],obj[keys[i]]];
+        }
+        return pairs;
+    };
     
+    /**
+     * 将对象中的值与属性对调
+     */
+    _.invert=function(obj){
+        var result={};
+        var keys=_.keys(obj);
+        for(var i=0,length=keys.length;i<length;i++){
+            result[obj[keys[i]]]=keys[i];
+        }
+        return result;
+    };
+    /**
+     * 返回对象中函数的排序后的集合 
+     */
+    _.functions=_.methods=function(obj){
+        var names=[];
+        for(var key in obj){
+            if(_.isFunction(obj[key])) names.push(key);
+        }
+        return names.sort();
+    };
+    _.extend=createAssigner(_.keysIn);
+    _.assign=createAssigner(_.keys);
+    _.findKey=function(obj,predicate,context){
+        predicate=cb(predicate,context);
+        var keys=_.keys(obj),key;
+        for(var i=0,length=keys.length;i<length;i++){
+            key=keys[i];
+            if(predicate(obj[key],key,obj)) return key;
+        }
+    };
+    _.pick=function(obj,iteratee,context){
+        var result={},key;
+        if(obj==null) return result;
+        if(_.isFunction(iteratee)){
+            iteratee=optimizeCb(iteratee,context);
+            for(key in obj){
+                var value=obj[key];
+                if(iteratee(value,key,obj)) result[key]=value;
+            }
+        }else{
+            var keys=flatten(arguments,false,false,1);
+            obj=new Object(obj);
+            for(var i=0,lenth=keys.length;i<length;i++){
+                key=keys[i];
+                if(key in obj) result[key]=obj[key];
+            }
+        }
+        return result;
+    }
+    _.omit=function(obj,iteratee,context){
+        if(_.isFunction(iteratee)){
+            iteratee=_.negate(iteratee);
+        }else{
+            var keys=_.map(flatten(arguments,false,false,1),String);
+            iteratee=function(value,key){
+                return !_.contains(keys,key);
+            };
+        }
+        return _.pick(obj,iteratee,context);
+    };
 
+    _.defaults=function(obj){
+        if(!_.isObject(obj)) return obj;
+        for(var i=1,length=arguments.length;i<length;i++){
+            var source=arguments[i];
+            for(var prop in source){
+                if(obj[prop]===void 0) obj[prop]=source[prop];
+            }
+        }
+        return obj;
+    };
+    _.create=function(prototype,props){
+        var result=baseCreate(prototype);
+        if(props) _.assign(result,props);
+        return result;
+    };
 
+    _.clone=function(obj){
+        if(!_.isObject(obj)) return obj;
+        return _.isArray(obj)?obj.slice():_.extend({},obj);
+    };
+
+    _.tap=function(obj,iterceptor){
+        iterceptor(obj);
+        return obj;
+    }
+    /**
+     * 内部递归比较功能的 isEqual
+     */
+    var eq=function(a,b,aStack,bStack){
+        if(a===b) return a!==0|| 1 / a===1 / b;
+        if(a==null || b ==null) return a===b;
+        if(a instanceof _) a=a._wrapped;
+        if(b instanceof _) b=b._wrapped;
+        //比较 [[Class]] 名称
+        var className=toString.call(a);
+        if(className!==toString.call(b)) return false;
+        switch(className){
+            //Strings,numbers,regular expressions, dates, and booleans are compared by value;
+            case '[object RegExp]':
+            // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
+            case '[object String]':
+                return ''+a===""+b;
+            case '[Object Number]':
+                if(+a!==+a) return +b!==+b;
+            return +a===0 ? 1 / +a === 1 / b:+a===+b;
+            case '[object Date]':
+            case '[object Boolean]':
+                return +a===+b;
+        }
+
+        var areArrays=className==='[object Array]';
+        if(!areArrays){
+            if(typeof a !='object' || typeof b!='object') return false;
+            var aCtor=a.constructor,bCtor=b.constructor;
+            if(aCtor!==bCtro && !(_.isFunction(aCtor)&& aCtor instanceof aCtor &&
+                     _.isFunction(bCtor)&&bCtor instanceof bCtro)
+                    &&('constructor' in a && 'constructor' in b)){
+                        return false;
+            }
+        }
+        var length=aStack.length;
+        while(length--){
+            if(aStack[length]===a) return bStack[length]===b;
+        }
+        aStack.push(a);
+        bStack.push(b);
+        if(areArrays){
+            //判断数组长度 决定是否有深入比较的必要
+            length=a.length;
+            if(length!==b.length) return false;
+            //深度比较内容 忽视 non-numeric peoperties;
+            while(length--){
+                if(!eq(a[length],b[length],aStack,bStack)) return false;
+            }
+        }else{
+            //深度比较对象
+            var keys=_.keys(a),key;
+            length=keys.length;
+            //比较前假定两个对象拥有同样数量的属性
+            if(_.keys(b).length!==length) return false;
+            while(length--){
+                key=keys[length];
+                if(!(_.has(b,key) && eq(a[key],b[key],aStack,bStack))) return false;
+            }
+        }
+        //// Remove the first object from the stack of traversed objects.
+        aStack.pop();
+        bStack.pop();
+        return true;
+    };
 
 
     
