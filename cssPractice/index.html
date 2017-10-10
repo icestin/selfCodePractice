@@ -6,26 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href='index.css' type='text/css' rel="stylesheet">
     <title>css</title>
+    <style>
+    .flex{
+        display:flex; width:800px;margin:0;padding:0;list-style: none;
+        background-color: #F1DBDB;
+    }
+    .flex :nth-child(1){flex:1 1 300px; background-color: #F19D9D;}
+    .flex :nth-child(2){flex:2 2 200px; background-color: #D16060;}
+    .flex :nth-child(3){flex:3 3 400px; background-color: #5F1C1C;}
+
+    </style>
 </head>
 <body>
-  <div class='contentBox'>
-      content-box
-
-      20x2px+1x2px,一共是242px。
-  </div>
-  <div class='borderBox'>
-      border-box
-
-    宽高200px的方块
-    方块内边距和边框线都包含在了200px中
-    </div>
-    <!-- <div class='g-wrap'>   
-       <div class='g-grid-4'>1</div>
-       <div class='g-grid-4'>2</div>
-       <div class='g-grid-4'>3</div>
-    </div> -->
-    <div class='g-header'>header</div>
-    <div class='g-nav'>nav</div>
-    <div class='g-content'>content</div>
+ <!-- <div class='divCss borderCss backGround'>
+ </div> -->
+ <div>
+     <ul class='flex'>
+       <li>a</li>
+       <li>b</li>
+       <li>c</li>
+     </ul>
+ </div>
 </body>
 </html>

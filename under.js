@@ -1127,8 +1127,158 @@
         bStack.pop();
         return true;
     };
+    /**
+     * 深度比较判断是否相等
+     */
+    _.isEqual=function(a,b){
+        return eq(a,b,[],[]);
+    }
 
+    /**
+     * 输入 Array string 或者 object 是否为空
+     */
+    _.isEmpty=function(obj){
+        if(obj===null) return true;
+        if(_.isArray(obj)||_.isString(obj)||_.isArguments(obj)) return object.length===0;
+        for(var key in obj) if(_.has(obj,key)) return false;
+        return true;
+    };
 
+    /**
+     * 判断给定的是否是 DOM element类型
+     */
+    _.isElement=function(obj){
+        return !!(obj && obj.nodeType===1);
+    };
+
+    /**
+     * 判断给定值是否是数组
+     */
+    _.isArray=nativeIsArray||function(obj){
+        return toString.call(obj)==='[object Array]';
+    };
+
+    /**
+     * 判断给定对象是否是 对象
+     */
+    _.isObject=function(obj){
+        var type=typeof obj;
+        return type==='function'||type==='object' && !!obj;
+    };
+
+    /**
+     * 添加一些 isType方法：isArguments,isFunction,isString,isNumber,isDate,isRegExp,isError.
+     */
+    _.each(['Arguments','Function','String','Number','Date','RegExp','Error'],function(name){
+        _['is'+name]=function(obj){
+            return toString.call(obj)==='[object]'+name+']';
+        };
+    });
     
+    /**
+     * Define a fallback version of the method in browsers (ahem, IE < 9)
+     * where there isn't any inspectable "Arguments" type.
+     * 定义一个可靠的方法 
+     * 
+     */
+    if(!_.isArguments(arguments)){
+        _.isArguments=function(obj){
+            return _.has(obj,'callee');
+        };
+    }
+    /**
+     * Optimize `isFunction` if appropriate. Work around an IE 11 bug (#1621).
+     * Work around a Safari 8 bug (#1929)
+     */
+    if(typeof /./ !='function' && typeof Int8Array !='object'){
+        _.isFunction=function(obj){
+            return typeof obj==='function'||false;
+        };
+    }
+    /**
+     * 判定给定对象是否是无限值
+     */
+    _.isFinite=function(obj){
+        return isFinite(obj) && !isNaN(parseFloat(obj));
+    };
+    /**
+     * NaN是唯一一个不等于它本身的值
+     */
+    _.isNaN=function(obj){
+        return _.isNumber(obj) && obj!==+obj;
+    };
+    /**
+     * 判断Boolean的值类型
+     */
+    _.isBoolean=function(obj){
+        return obj===true||obj===false||toString.call(obj)==='[object Boolean]';
+    };
+    _.isNull=function(obj){
+        return obj===null;
+    };
+    _.isUndefined=function(obj){
+        return obj===void 0;
+    };
+    /**
+     * 看是否是自身属性
+     */
+    _.has=function(obj,key){
+        return obj!=null && hasOwnProperty.call(obj,key);
+    };
+    
+    // Utility Functions
+    //-------------------
+    _.noConflict=function(){
+        root._=previousUnderscore;
+        return this;
+    };
+
+    /**
+     * Keep the identity function around for default iteratees.
+     */
+    _.identity=function(value){
+        return value;
+    };
+    /**
+     * Predicate-generating functions. Often useful outside of Underscore.
+     */
+    _.constant=function(value){
+        return function(){
+            return value;
+        };
+    };
+
+    _.noop=function(){};
+    _.property=function(key){
+        return function(obj){
+            return obj===null ? void 0:obj[key];
+        };
+    };
+    /**
+     * Generates a function for a given object that returns a given property (including those of ancestors)
+     */
+    _.propertyOf=function(obj){
+        return obj===null ? function(){}:function(key){
+            return obj[key];
+        };
+    };
+    /**
+     * 检测对象是否需要 'key:value'对的形式
+     */
+    _.matches=function(attrs){
+        var  pairs=_.pairs(attrs),length=pairs.length;
+        return function(obj){
+            if(obj===null) return !length;
+            obj=new Object(obj);
+            for(var i=0; i<length; i++){
+                var pair=pairs[i],key=pairs[0];
+                if(pair[1]!==obj[key]||(key in obj)) return false;
+            }
+            return true;
+        };
+    };
+    
+
+
 
 }.call(this));
