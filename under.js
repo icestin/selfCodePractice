@@ -21,16 +21,16 @@
     
     var _=function(obj){
        if(obj instanceof _) return obj;
-       if(!(obj instanceof _)) return new _(obj);
+       if(!(this instanceof _)) return new _(obj);
        this._wrapped=obj;
     };
     
     //导出该类
-    if(typeof exports!=='underfined'){
-        if(typeof module!=='underfined'&&module.exports){
-            exports=module.exports=_;
+    if(typeof exports!=='undefined'){
+        if(typeof module!=='undefined' && module.exports){
+           exports=module.exports=_;
         }
-        exports._=_;
+       exports._=_;
     }else{
         root._=_;
     }
@@ -1277,8 +1277,247 @@
             return true;
         };
     };
-    
+
+    /**
+     * 值a 大于(1)等于（0）小于（-1）值b
+     */
+    _.comparator=function(a,b){
+       if(a===b) return 0;
+       var isAComparable=a>=a,isBComparable = b >=b;
+       if(isAcomparable||isBcomparable){
+           if(isAcomparable && !isBcomparable) return -1;
+           if(isBcomparable && isAcomparable) return 1;
+       }
+       return a > b ? 1 : (b > a) ? -1:0;
+    };
+
+    /**
+     * 执行 n次 function
+     */
+    _.times=function(n,iteratee,context){
+        var accum=Array(Math.max(0,n));
+        iteratee=optimizeCb(iteratee,context,1);
+        for(var i=0; i<n;i++) accum[i]=iteratee(i);//for循环中n的值是否需要改为 accum的长度？
+        return accum;
+    };
+    /**
+     * 返回 介于 min ~ max之间的随机数
+     */
+    _.random=function(min,max){
+        if(max==null){
+            max=min;
+            min=0;
+        }
+        return min+Math.floor(Math.random()*(max-min+1));
+    };
+
+    /**
+     * 返回当前时间戳 timestamp
+     */
+    _.now=Date.now||function(){
+        return new Date().getTime();
+    };
+
+    /**
+     * 转义的HTML实体列表
+     */
+    var escapeMap={
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        ',':'&#x27;',
+        '`':'&#x60;',
+    };
+    var unescapeMap=_.invert(escapeMap);
+    /**
+     * Functions for escaping and unescaping strings to/from HTML interpolation.
+     * @param {*} map 
+     */
+    var createEscaper=function(map){
+        var escaper=function(match){
+            return map[match];
+        };
+        //Regexes for identifying a key that needs to be escaped
+        var source='(?:'+_.keys(map).join('|')+')';
+        var testRegexp=RegExp(source);
+        var replaceRegexp=RegExp(source,'g'); 
+        return function(string){
+            string=string===null? '':''+ string;
+            return testRegexp.text(string) ? string.replace(replaceRegexp,escaper): string;
+        };
+    };
+    /**
+     * 转义HTML字符串，替换&, <, >, ", ', 和 /字符。
+     */
+    _.escape=createEscaper(escapeMap);
+    /**
+     * 转义HTML字符串，替换&, &lt;, &gt;, &quot;, &#96;, 和 &#x2F;字符。
+     */
+    _.unescape=createEscaper(unescapeMap);
+    /**
+     * 如果对象object 中的属性property是函数，则调用它，否则，返回它。
+     */
+    _.result=function(object,property,fallback){
+        var value=object == null ? void 0 : object[property];
+        if(value===void 0){
+            value=fallback;
+        }
+        return _.isFunction(value) ? value.call(object) : value;
+    };
+
+    var idCounter = 0;
+    /**
+     * 为需要的客户端模型或DOM元素生成一个全局唯一的id。如果prefix参数存在， id 将附加给它。
+     * _.uniqueId('contact_');
+      => 'contact_104'
+     */
+    _.uniqueId=function(prefix){
+        var id=++idCounter+'';
+        return prefix ? prefix + id : id;
+    };
+    /**
+     * 通过JSON数据源生成复杂的HTML并呈现出来
+     * 模板函数可以使用 <%=...%> 传入变量
+     * 模板函数可以使用 <%...%> 执行任意的 JavaScript代码
+     * 模板函数可以使用 <%-...%> 插入一个值 并进行HTML转义
+     */
+    _.templateSettings={
+        evaluate       : /<%([\s\S]+?)%>/g,  //逻辑
+        interpolate    : /<%=([\s\S]+?)%>/g,  //直接用渲染数据进行替换  
+        escape         : /<%-([\s\S]+?)%>/g
+    };
+
+    /**
+     * 
+     */
+    var noMatch=/(.)^/;
+    /**
+     * 修改渲染器对转义字符串进行逃逸
+     */
+    var escapes={
+     "'"    :   "'",
+     '\\'   :   "\\",
+     '\r'   :   'r',
+     '\n'   :   'n',
+     '\u2028':   'u2028',  //行分隔符
+     '\u2029':   'u2029'   //行结束符
+    };
+    var escaper=/\\|'|\r|\n|\u2028|\u2029/g; //逃逸正则
+    var escapeChar=function(match){ //特殊字符逃逸
+        return '\\'+escapes[match];
+    };
+    /*
+    * underscore实现的一个js微模板引擎
+    * @param {string} text
+    * @param {object} settings 模板配置
+    * @param {object} oldSettings 该参数用以向后兼容
+    */
+    _.template=function(text,settings,oldSettings){
+        //矫正模板配置
+        if(!settings && oldSettings) settings=oldSettings;
+        //获得最终的模板配置
+        settings=_.defaults({},settings,_.templateSettings);
+        // 获得的最终的匹配正则 /<%-([\s\S]+?)%>|<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g
+
+        var matcher=RegExp([
+            (settings.escape||noMatch).source,
+            (settings.interpolate||noMatch).source,
+            (settings.evaluate||noMatch).source
+        ].join('|')+'|$','g');
+        
+        var index=0;
+        //source 用来保存最终的函数执行体
+        var source="__p+='";
+        //replace的第二个参数是函数：mathc 匹配的字符串
+        // p1, p2,
+        //offset匹配到的子字符串在原字符串中的偏移量 比喻原字符串是‘abcd’ 匹配到的是bc 则该参数是 1
+        //string 被匹配的原字符串
+        // 正则替换模板内容 逐个匹配 逐个替换
+        text.replace(matcher,function(match,escape,interpolate,evaluate,offset){
+            //开始拼接字符串 并进行字符逃逸
+            source += text.slice(index,offset).replace(escaper,escapeChar);
+            index=offset + match.length;
+            if(escape){
+                source+="'+\n((__t=("+escape+"))==null?'':_.escape(__t))+\n";
+            }else if (interpolate){ //如果是插值
+                source+="'+\n((__t=("+interpolate+"))==null?'':__t)+\n'";
+            }
+            else if(evaluate){ //如果是执行逻辑
+                source+="';\n"+evaluate+"\n__p+='";
+            }
+            return match;
+        });
+
+        source+="';\n";
+
+        //
+        if(!settings.variable) source='with(obj||{}){\n'+source+'}\n';
+
+        source="var __t,__p='',__j=Array.prototype.join,"+
+        "print=function(){__p+=__j.call(arguments,'');};\n"+
+        source+'return __p;\n';
+        
+       try{
+           var render=new Function(settings.variable||'obj','_',source);
+       }catch(e){
+           e.source=source;
+           throw e;
+        }
+        var template=function(data){
+            return render.call(this,data,_);
+        }
+        //保留编译后的源码
+        var argument=settings.variable||'obj';
+        template.source='function('+argument+'){\n'+source+'}';
+        return template;   
+    };
 
 
+    _.chain=function(obj){
+        var instance=_(obj);
+        instance._chain=true;
+        return instance;
+    };
+
+    var result=function(instance,obj){
+        return instance._chain ? _(obj).chain():obj;
+    }
+    _.mixin=function(obj){
+        _.each(_.functions(obj),function(name){
+            var func=_[name]=obj[name];
+            _.prototype[name]=function(){
+                var args=[this._wrapped];
+                push.apply(args,arguments);
+                return result(this,func.apply(_,args));
+            };
+        });
+    }
+    //Add all of the Underscore functions to the wrapper object.
+    _.mixin(_);
+    // Add all mutator Array functions to the wrapper.
+    _.each(['pop','push','reverse','shift','sort','splice','unshift'],function(name){
+     var method=ArrayProto[name];
+     _.prototype[name]=function(){
+         var obj=this._wrapped;
+         method.apply(obj,arguments);
+         if((name==='shift'||name==='splice')&&obj.length===0) delete obj[0];
+         return result(this,obj);
+     };
+    });
+    //Add all accessor Array functions to the wrapper.
+    _.each(['concat','join','slice'],function(name){
+        _.prototype[name]=function(){
+            return result(this,method.apply(this._wrapped,arguments));
+        };
+    });
+    _.prototype.value=function(){
+        return this._wrapped;
+    };
+    if(typeof define==='function' && define.amd){
+        define('underscore',[],function(){
+            return _;
+        });
+    }
 
 }.call(this));
