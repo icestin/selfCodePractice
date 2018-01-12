@@ -1,14 +1,11 @@
 //var isDilogTitle=null;
 var draggingObj=null;
-var diffX=0,diffY=0;
+var diffX=0, diffY=0;
 
 function down(e){
     if(e.target.className.indexOf('dialog-title')!=-1)
     {
-        //isDilogTitle=true;
-        draggingObj=e.target.offsetParent;
-        console.log('对象事件',e);
-        
+        draggingObj=e.target.offsetParent;        
         diffX=e.clientX-draggingObj.offsetLeft;
         diffY=e.clientY-draggingObj.offsetTop;
     }
@@ -23,6 +20,7 @@ function move(e){
 function up(e){
     draggingObj=null;
 }
+
 document.addEventListener('mousedown',down);
 document.addEventListener('mousemove',move);
 document.addEventListener('mouseup',up);
