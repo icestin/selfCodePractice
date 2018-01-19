@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>下雪效果</title>
+    <style>
+    /* canvas{
+        /* background:rgb(173, 38, 38); 
+    } */
+    </style>
+</head>
+<body>
+    <canvas id="snowfall">下雪效果</canvas>
+    <script src='rectangleEmitter.js'></script>    
+    <script src='snow.js'></script>
+    <script>
+     window.onload = function() {
+         var canvas = document.getElementById('snowfall');
+         canvas.height = window.innerHeight;
+         canvas.width = window.innerWidth;
+         var emitter = Object.create(rectangleEmitter);
+         console.log('触发对象',emitter);
+         emitter.setCanvas(canvas);
+         emitter.setBlastZone(0, -10, canvas.width, 1);
+         emitter.particle = snow;
+         emitter.runAhead(0);
+         emitter.start(60);
+     }
+    </script>
+</body>
+</html>
