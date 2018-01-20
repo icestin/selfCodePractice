@@ -32,6 +32,9 @@ var rectangleEmitter = {
      */
     particles: [],
 
+    /***
+     * 粒子数量
+     */
     maxParticles: 700,
     /**
 	 * The intervalID for the FPS interval
@@ -114,7 +117,7 @@ var rectangleEmitter = {
         while( i-- ){
             p = this.particles[i];
             p.update();
-            // 移除失效的粒子效果
+            // 移除失效的粒子效果 当超过边界时
             if (p.y > this.canvas.height) {
                 this.particles.splice(i, 1);
             }
