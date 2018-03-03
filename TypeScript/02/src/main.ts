@@ -5,4 +5,4 @@ function showHello (divName: string, name:string) {
     elt.innerHTML = sayHello(name);
 }
 
-showHello('greeting', "TypeScript");
+showHello('greeting', "TypeScript23");
