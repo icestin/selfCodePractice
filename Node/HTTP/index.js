@@ -1,6 +1,8 @@
 // 1  git  branch BranchName
 // 2  git checkout BranchName
 // 3  operate file
-//  git commit -a -m 删掉旧内容
+//  git commit -a -m 'some message new content'
 
-//添加新内容
+// 添加内容 
+// 删去就内容
+// 不断更新内容
