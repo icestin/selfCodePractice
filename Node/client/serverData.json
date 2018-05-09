@@ -1,0 +1,12 @@
+{
+    "data": [
+        {
+            "name":"小明",
+             "gender": "Boy"
+        },
+        {
+            "name":"小刘",
+             "gender": "Boy"
+        }
+    ]
+}
