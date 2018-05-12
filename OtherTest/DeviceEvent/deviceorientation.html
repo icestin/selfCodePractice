@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>orientationchange事件</title>
+</head>
+<body>
+    <div>
+        <h2>设备deviceorientation事件</h2>
+        <p>aplha: 围绕z轴旋转，左右旋转， y轴的度数差 0 ~ 360 浮点数 </p>
+        <p>beta:   围绕x轴旋转，前后旋转， z轴的度数差 -180 ~ 180 浮点数 </p>
+        <p>gamma: 围绕y轴旋转，扭动设备， z轴的度数差 -90 ~ 90 浮点数 </p>
+    </div>
+    <div id='myDiv' ></div>
+    <div style="margin: 40px">
+        <img src='arrow.png' alt='箭头' id='arrowID'>
+    </div>
+    <script>
+      window.addEventListener('load', function(e){
+          var div = document.getElementById('myDiv');
+          var arrow = document.getElementById('arrowID');
+          div.innerHTML = "当前方向：" + window.orientation;
+          window.addEventListener('deviceorientation', function(e2){
+              div.innerHTML = "Alpha：" + e2.alpha +  ",\n \n Beta:" + e2.beta +", \n \n Gamma: " + e2.gamma
+              + "\n 是否校准过指南针:"+ e2.compassCalibrated;
+            arrow.style.webkitTransform ="rotate(" + Math.round(e2.alpha) + "deg)";
+          })
+      })
+    
+    </script>
+</body>
+</html>

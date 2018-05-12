@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>devicemotion</title>
+</head>
+<body>
+    <div>
+        <h2>设备devicemotion事件：设备什么时候移动，设备方向如何改变</h2>
+        <h3>检查设备是不是再往下掉，或者是不是被人拿在手里</h3>
+    </div>
+    <div id='myDiv' ></div>
+    <div style="margin: 40px">
+    </div>
+    <script>
+      window.addEventListener('load', function(e){
+          var div = document.getElementById('myDiv');
+          var arrow = document.getElementById('arrowID');
+          div.innerHTML = "当前方向：" + window.orientation;
+          var desc = '';
+          window.addEventListener('devicemotion', function(e2){
+              
+              if (e2.rotationRate) {
+                  desc = "\n 方向 Alpha：" + e2.rotationRate.alpha +  ",\n \n Beta:" + e2.rotationRate.beta +", \n \n Gamma: " + e2.rotationRate.gamma
+              }
+              if (e2.accelerationIncludingGravity) {
+                  desc = "\n 考虑重力加速度 x" + e2.accelerationIncludingGravity.x +  ",\n \n y:" + e2.accelerationIncludingGravity.y +", \n \n z: " + e2.accelerationIncludingGravity.z
+              }
+              if (e2.acceleration) {
+                  desc = "\n 不考虑重力的加速度 x" + e2.acceleration.x +  ",\n \n y:" + e2.acceleration.y +", \n \n z: " + e2.acceleration.z
+              }
+              div.innerHTML = desc
+           
+          })
+      })
+    
+    </script>
+</body>
+</html>
