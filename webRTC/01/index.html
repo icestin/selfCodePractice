@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML媒体捕获</title>
+</head>
+
+<body>
+    <h1>HTML 媒体捕获</h1>
+    <input type='file' accept='image/*;capture=camera' value='快照' />
+    <input type='file' accept='video/*;capture=camcorder' value='视频' />
+    <input type='file' accept='audio/*;capture=microphone' value='音频' />
+    <device type='media' onchange="updata(this.data)"></device>
+    <video autoplay></video>
+    <script>
+        function update(stream) {
+            document.querySelector('video').src = stream.url;
+        }
+        function hasGetUserMedia() {
+            return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia);
+        }
+        function getUserMedia() {
+            return (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia);
+        }
+        window.onload = function () {
+            var ifs = hasGetUserMedia();
+            console.log("是否支持Media", ifs);
+            createUserMedia();
+        }
+        var onFailSoHard = function (e) {
+            console.log('Rejected !', e);
+        }
+        function createUserMedia() {
+            navigator.webkitGetUserMedia({audio: true, video: true}, function (localMediaStream) {
+            var video = document.querySelector('video');
+            video.src = window.URL.createObjectURL(localMediaStream);
+            video.onloadedmetadata = function (e) {
+                console.log('loademetadata e', e);
+            }
+        }, onFailSoHard);
+        }
+        
+    </script>
+</body>
+
+</html>
