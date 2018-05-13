@@ -18,7 +18,7 @@ getUserMedia()的第一个参数用于指定要访问的媒体类型。 请求�
  var onFailSoHard = function(e) {
      console.log('Rejected !', e);
  }
- navigator.getUserMedia('video, audio', function(localMediaStream) {
+ navigator.getUserMedia({audio: true, video: true}, function(localMediaStream) {
      var video = document.querySelector('video');
      video.src = window.URL.createObjectURL(localMediaStream);
      video.onloadedmetadata = function(e) {
@@ -34,4 +34,7 @@ getUserMedia()的第一个参数用于指定要访问的媒体类型。 请求�
 
 * http-server 启动https服务器
 openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem
-http-server -S -C cert.pem -o
+ http-server -S -C cert.pem -o
+
+ ### 截取屏幕截图
+  <canvas> API的ctx.drawImage(video, 0, 0)可以将<video>帧绘制到<canvas>上
