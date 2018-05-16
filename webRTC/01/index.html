@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML媒体捕获</title>
+</head>
+
+<body>
+    <h1>HTML 媒体捕获</h1>
+
+    <video autoplay></video>
+    <script>
+      
+        function hasGetUserMedia() {
+            return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia);
+        }
+        function getUserMedia() {       
+                return navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia;
+        }
+        window.onload = function () {
+            var ifs = hasGetUserMedia();
+            if(ifs) {
+                createUserMedia();
+            }
+            console.log("是否支持Media", ifs);
+        }
+        // 创建失败的回调函数
+        var onFailSoHard = function (e) {
+            console.log('Rejected 失败!', e);
+            video.src = 'fallbackvideo.webm';
+        }
+        // 创建成功的回调函数
+        function success(strem) {
+            var video = document.querySelector('video');
+            video.src = window.URL.createObjectURL(localMediaStream);
+            video.onloadedmetadata = function (e) {
+                console.log('loademetadata e', e);
+            }
+        }
+        function createUserMedia() {
+            navigator.getUserMedia({audio: true, video: true}, success, onFailSoHard);
+        }
+        
+    </script>
+</body>
+
+</html>

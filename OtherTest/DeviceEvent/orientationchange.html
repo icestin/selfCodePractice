@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>orientationchange事件</title>
+</head>
+<body>
+    <div>
+        <h2>设备查看模式</h2>
+        <p>横向 左横 90 右横-90</p>
+        <p>纵向 0</p>
+    </div>
+    <div id='myDiv' ></div>
+    <script>
+      window.addEventListener('load', function(e){
+          var div = document.getElementById('myDiv');
+          div.innerHTML = "当前方向：" + window.orientation;
+          window.addEventListener('orientationchange', function(e2){
+              div.innerHTML = "当前方向：" + window.orientation  + "\n";
+          })
+      })
+    
+    </script>
+</body>
+</html>

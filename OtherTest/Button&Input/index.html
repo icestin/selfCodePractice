@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试button与input的区别</title>
+</head>
+<body>
+   <input  type="button" value="inputValue" id="inputID"/>
+   <button value="buttonValue" id='buttonID'> Button 按钮</button>
+   <script > 
+    var input = document.getElementById('inputID'),
+    button = document.getElementById('buttonID')
+    ;
+    console.log("inputValue", input.value);
+    console.log("buttonValue", button.value); // <ie7时才显示”Button 按钮“字样
+   </script>
+</body>
+</html>

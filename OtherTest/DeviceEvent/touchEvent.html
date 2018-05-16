@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>触摸事件</title>
+</head>
+<body>
+    <div id="outID">
+           点击屏幕开始触摸
+    </div>
+
+    <script>
+    window.addEventListener('load', function(e){
+        bindTouch();
+    })
+    function bindTouch() {
+        document.addEventListener('touchstart', handleTouchEvent);
+        document.addEventListener('touchmove', handleTouchEvent);
+        document.addEventListener('touchend', handleTouchEvent);
+    }
+    function handleTouchEvent(e) {
+        if(e.touches) {
+            var output = document.getElementById('outID');
+            var desc = '', ths = e.touches;
+            for(var i = 0,len =ths.length; i < len;i++) {
+                desc += '\n 第'+(i+1)+' clientX: ' + ths[i].clientX + " : clientY" + ths[i].clientY;
+            }
+            switch(e.type) {
+                case "touchstart": 
+                   output.innerHTML = desc;
+                break;
+                case "touchend": 
+                   output.innerHTML = desc;
+                break;
+                case "touchmove": 
+                    e.preventDefault(); // 阻止滚动
+                   output.innerHTML = desc;
+                break;
+            }
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0;">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>触摸手势事件</title>
+</head>
+<body>
+    <div id="outID">
+           两个手指开始触摸 触发手势事件
+    </div>
+
+    <script>
+    window.addEventListener('load', function(e){
+        bindTouch();
+    })
+    function bindTouch() {
+        document.addEventListener('touchstart', handleTouchEvent);
+        document.addEventListener('touchmove', handleTouchEvent);
+        document.addEventListener('touchend', handleTouchEvent);
+    }
+    function handleTouchEvent(e) {
+        try {
+            var output = document.getElementById('outID');
+            output.innerHTML = '开始手势'
+            var desc = '';
+            // for(var i = 0,len =ths.length; i < len;i++) {
+                desc += '\n rotation: ' + e.rotation + " : scale" + e.scale;
+            // }
+            switch(e.type) {
+                case "gesturestart": 
+                   output.innerHTML = desc;
+                break;
+                case "gestureend": 
+                   output.innerHTML = desc;
+                break;
+                case "gesturechange": 
+                    // e.preventDefault(); // 阻止滚动
+                   output.innerHTML = desc;
+                break;
+                default: output.innerHTML = e.type;
+            }
+        } catch (error) {
+            alert(JSON.stringify(error));
+        }    
+            
+            
+    }
+    </script>
+</body>
+</html>

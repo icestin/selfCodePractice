@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>截取屏幕截图</title>
+</head>
+
+<body>
+    <h1>截取视频截图</h1>
+
+    <video autoplay></video>
+    <img src="">
+    <canvas style="display: none;"></canvas>
+    <script>
+        var video = document.querySelector('video');
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        var localMediaStream = null;
+        
+        // 图像捕获
+        function snapshot () {
+            if (localMediaStream) {
+                ctx.drawImage(video, 0, 0);
+                document.querySelector('img').src = canvas.toDataURL('image/webp');
+            }
+        }
+        video.addEventListener('click', snapshot, false);
+        function hasGetUserMedia() {
+            return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia);
+        }
+        function getUserMedia() {       
+                return navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia;
+        }
+        window.onload = function () {
+            var ifs = hasGetUserMedia();
+            if(ifs) {
+                createUserMedia();
+            }
+            console.log("是否支持Media", ifs);
+        }
+        // 创建失败的回调函数
+        var onFailSoHard = function (e) {
+            console.log('Rejected 失败!', e);
+            video.src = 'fallbackvideo.webm'; //失败时添加默认视频播放地址
+        }
+        // 创建成功的回调函数
+        function success(strem) {
+            video.src = window.URL.createObjectURL(strem);
+            localMediaStream = strem;
+            video.onloadedmetadata = function (e) {
+                console.log('loademetadata e', e);
+            }
+        }
+        function createUserMedia() {
+            navigator.getUserMedia({audio: true, video: true}, success, onFailSoHard);
+        }
+        
+    </script>
+</body>
+
+</html>
