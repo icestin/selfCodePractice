@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[0],{4:function(o,n,s){"use strict";s.r(n),console.log("print.js文件已经被加载"),n.default=(()=>{console.log("按钮被点击")})}}]);

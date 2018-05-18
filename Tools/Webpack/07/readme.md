@@ -19,3 +19,8 @@ promise-loader: 类似于bundle-loader，但使用的是promises.
 ### 动态导入 dynamic imports
 * 优先选择 ECMAScript提案中 import语法
 * webpack中特定的require.ensure.
+
+=== 
+
+## 懒加载
+懒加载： 先把你的代码逻辑断点处分离开，然后在一些代码块中完成某些操作后，立即引用或即将引用另外一些新的代码块。这样加快了应用程序的加载速度，减轻了它的总体积， 有些代码模块可能永远不会被加载
