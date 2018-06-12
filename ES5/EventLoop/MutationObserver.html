@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>进阶microtask任务</title>
+</head>
+<body>
+    <div class='outer'> 外部
+        <div class="inner"> 内部</div>
+    </div>
+    <p>
+       点外部 输出 click  promise mutate timeout
+    </p>
+    <p>
+        点内部 chrome, Edge 输出 click  promise mutate  click promise mutate timeout timeout
+     </p>
+     <P>
+        click 的回调函数是一个 task，而 Promise 和 MutationObserver 是一个 microtask，setTimeout 是一个 task，
+     </P>
+    <script>
+    var outer = document.querySelector('.outer');
+    var inner = document.querySelector('.inner');
+
+    // 给 outer添加一个观察者
+    new MutationObserver(function(){
+        console.log('mutate');
+    }).observe(outer, {
+        attributes: true
+    });
+    // click 回调函数
+    function onClick() {
+        console.log("click");
+        setTimeout(function(){
+            console.log('timeout');
+        }, 0);
+
+        Promise.resolve().then(function() {
+            console.log('promise');
+        })
+
+        outer.setAttribute('data-random', Math.random());
+    }
+
+    inner.addEventListener('click', onClick);
+    outer.addEventListener('click', onClick);
+
+
+    </script>
+</body>
+</html>

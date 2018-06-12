@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Microtask事件</title>
+</head>
+<body>
+    <h1> Microtask事件 测试示例</h1>
+    <h4>结果：</h4>  <h5>'script start'、'script end'、'promise1'、'promise2'、'setTimeout'</h5>
+    <p>
+        每一个“线程”都有一个独立的event loop， 每一个web worker也有一个独立的event loop;
+    </p>
+    <p>
+        event loop持续不断有序的执行队列中的任务tasks, 每个event loop都有众多不同的任务来源 task source,
+    </p>
+    <p>
+        task source 能够保证其中的task能够有序的执行， Task是严格按照时间顺序压栈和执行的
+    </p>
+    <p>
+        当一个task执行结束后，在下一个task开始前，浏览器可以对页面进行重新渲染， 每个task都是需要分配的，点击事件，渲染HTML,setTimeout等
+    </p>
+    <p>
+        setTimeout会在延迟的时间结束后分配一个task到event loop中，会等待前边的task都执行结束再运行。
+    </p>
+    <h3>
+        Microtask 通常来说是需要在当前task执行结束后立即执行的任务
+    </h3>
+    <p>
+        例如 需要对一系列任务做回应，或者异步的执行任务而不需要分配一个新的task,这样可以减少一点性能开销
+    </p>
+    <p>
+        microtask任务队列是一个与task任务队列相互独立的队列， microtask任务将会在每一个task任务结束之后执行。
+    </p>
+    <p>
+        每一个task中产生的microtask都会添加到microtask队列中，\n microtask产生的microtask将会添加至当前队列的尾部，
+        并且 microtask会按序处理完队列中的所有任务。
+    </p>
+    <p>
+        microtask类型任务目前包括了 MutationObserver 以及Promise的回调函数。\n
+        每当一个Promise被决议，便会将其回调函数添加至microtask任务队列中作为一个新的microtask,\n 这也保证了Promise可以是异步执行的。
+        当执行.then()的时候，会立即生成一个新的microtask添加至任务队列中， microtask任务队列必须等待当前task执行结束之后再下一个task开始执行前。
+    </p>
+    <p>
+        click 的回调函数是一个 task，而 Promise 和 MutationObserver 是一个 microtask，setTimeout 是一个 task，
+    </p>
+    <p>
+        ：用户操作的回调函数也是一个 task ，并且只要一个 task 执行结束且 JS stack 为空时，这时便检查 microtask ，如果不为空，则执行 microtask 队列。
+    </p>
+    <script>
+       console.log('Script start');
+
+       setTimeout(function() {
+          console.log('setTimeout');
+       }, 0);
+
+       Promise.resolve().then(function() {
+           console.log('promise1')
+       }).then(function(){
+           console.log('promise2')
+       });
+
+       console.log("Script end");
+
+    </script>
+</body>
+</html>
