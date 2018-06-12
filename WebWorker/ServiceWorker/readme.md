@@ -13,3 +13,16 @@
      * 安装（install）失败
      * 激活（activating）失败
      * 新版本的 Service Worker替换了它成为激活状态
+  
+  3. 使用 Service Worker 
+      https Or localhost
+ ```
+   if ('serviceWorker' in navigator) {
+     navigator.serviceWorker.register('/sw/sw.js', {scope: '/'}).then(
+       registration => console.log("注册成功");
+     )
+   }
+ ```
+   * Service Worker的注册路径决定了scope的默认作用范围，示例sw.js是在/sw/路径下，则该Service Worker默认只会接收到 /sw/路径下的fetch事件，如果希望改变其作用域，可以设置第二个参数scope范围。 示例会对整个站点生效。
+   * Service Worker没有页面作用域的概念，作用域反问内的所有页面请求都会被当前激活的Service Worker所监控
+  
