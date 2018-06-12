@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>左侧定宽，右侧自适应</title>
+    <style>
+     *{margin: 0; padding:0;}
+     .left {
+         float:left;
+         background-color: blue;
+         border: 1px solid #333;
+         width: 200px;
+         height: 200px;
+     }
+     .right {
+         overflow: hidden;
+         background-color: red;
+         border: 1px solid #333;
+         height: 200px;
+     }
+    </style>
+</head>
+<body>
+    <div class='bd'>
+       <div class="left">左侧定宽</div>
+       <div class="right">右侧自适应</div>
+    </div>
+</body>
+</html>

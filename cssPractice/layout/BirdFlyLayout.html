@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>双飞翼布局</title>
+    <style>
+    body{min-width: 700px;} 
+    .floatLeft {
+        float: left;
+    }
+    body>div{
+        height: 200px;
+        width: 200px;
+    }
+    .main{
+        background-color: rgba(200, 100,50, 0.4);
+        width: 100%;
+    }
+    .main-inner {
+        margin: 0 200px 0 200px;
+    }
+    .sub {
+        background-color: rgba(150, 200, 50, 0.4);
+        margin-left: -100%;
+    
+    }
+    .extra {
+        background-color: rgba(20, 150, 240, 0.7);
+        margin-left: -200px;
+    }
+    
+    </style>
+</head>
+<body>
+    <div class="main floatLeft">    
+        <div class='main-inner'>
+                中间main内容页面        
+        </div>
+    </div>
+    <div class="sub floatLeft">左侧内容区域</div>
+    <div class="extra floatLeft">右侧面板内容区域</div>
+</body>
+</html>

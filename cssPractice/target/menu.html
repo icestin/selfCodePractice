@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>折叠菜单</title>
+    <style>
+     /* 首先修改一些浏览器默认 样式，清除margin padding等等。 */
+     .accordion, accordion ul,
+    .accordion li,
+    .accordion a,
+    .accordion span
+    { 
+        margin: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        text-align: left;
+    }
+    .accordion li {
+        list-style: none;
+    }
+
+    /* 定义菜单链接样式，添加渐变，阴影效果，定义字体等。 没有固定宽度，菜单的宽度100%填充父元素，
+    想把菜单设置成300px，你可以给它添加一个父div，指定宽度为300px就可以
+    定义最小宽度，保证菜单布局能正确显示 */
+
+    .accordion li > a {
+        display: block;
+        position: relative;
+        min-width: 110px;
+        padding: 0 10px 0 40px;
+        color: #fdfdfd;
+        font: bold 14px/32px 黑体,宋体;
+        text-decoration: none;
+        text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.35);
+        background:#6c6e74;
+        background: -moz-linear-gradient(top, #6c6e74 0%, #4b4d51 100%);
+        background: -webkit-linear-gradient(top, #6c6e74 0%, #4b4d51 100%);
+        background: linear-gradient(top, #6c6e74 0%, #4b4d51 100%);
+        -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255, 0.1), 0px 1px 0px 0px rgba(0,0,0,0.1);
+        box-shadow: inset 0px 1px 0px 0px rgba(255, 255,255,0.1), 0px 1px 0px 0px rgba(0,0,0,0.1);
+    }
+
+    /* 定义数字指示器 如果不需要可以删掉html中的span */
+    .accordion li > a span {
+        display: block;
+        position: absolute;
+        top: 7px;
+        right: 0;
+        padding: 0 10px;
+        margin-right: 10px;
+        font: normal bold 12px/18px Arial,sans-serif;
+        background: #404247;
+        -webkit-border-radius: 15px; 
+        border-radius: 15px;
+        box-shadow: inset 1px 1px 1px rgba(0,0,0,0.2), 1px 1px 1px rgba(255,255,255,0.1);
+    }
+    /*
+       添加图标样式 使用:before为菜单插入图标 创建sprite创建正常与hover是不同样式
+    */
+    .accordion > li > a:before{
+        position: relative;
+        top: 0;
+        left: 0;
+        content: '';
+        width: 24px;
+        height: 24px;
+        margin: 4px 8px;
+        background-repeat: no-repeat;
+        /* background-image: url(../image/icons.png); */
+        background-position: 0px 0px;
+    }
+
+.accordion li.files > a:before {background-color: red };
+.accordion li.files:hover > a:before,
+.accordion li.files:target > a:before {background-color: green}
+.accordion li.mail > a:before { background-color: red } 
+.accordion li.mail:hover > a:before, 
+.accordion li.mail:target > a:before { background-color: green } 
+.accordion li.cloud > a:before {background-color: red} 
+.accordion li.cloud:hover > a:before, 
+.accordion li.cloud:target > a:before { background-color: green } 
+.accordion li.sign > a:before { background-color: red } 
+.accordion li.sign:hover > a:before, 
+.accordion li.sign:target > a:before { background-color: green } 
+
+/*
+  子菜单HTML和样式
+*/
+.sub-menu li a {
+    font: bold 12px/32px 黑体,宋体;
+    color: #797979;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2);
+    background: #e5e5e5;
+    border-bottom: 1px solid #c9c9c9;
+    -webkit-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255, .1), 0px 1px 0px 0px rgba(0,0,0, .1); 
+    -moz-box-shadow: inset 0px 1px 0px 0px rgba(255,255,255, .1), 0px 1px 0px 0px rgba(0,0,0, .1); 
+     box-shadow: inset 0px 1px 0px 0px rgba(255,255,255, .1), 0px 1px 0px 0px rgba(0,0,0, .1); 
+    
+}
+.sub-menu li:last-child a {
+    border: none;    
+}
+.sub-menu li > a span {
+    color: #797979;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2);
+    background: transparent;
+    border: 1px solid #c9c9c9;
+    box-shadow: none;
+}
+.sub-menu em { 
+position: absolute; 
+top: 0; 
+left: 0; 
+margin-left: 14px; 
+color: #a6a6a6; 
+font: normal 10px/32px Arial, sans-serif; 
+} 
+/*
+定义鼠标悬浮和菜单激活时状态样式
+*/
+.accordion > li:hover > a,
+.accordion > li:target > a {
+    color: #3e5706;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.2);
+    background: #a5cd4e;
+    background: -moz-linear-gradient(top, #a5cd4e 0%, #6b8f1a 100%); 
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a5cd4e), color-stop(100%,#6b8f1a)); 
+background: -webkit-linear-gradient(top, #a5cd4e 0%,#6b8f1a 100%); 
+background: -o-linear-gradient(top, #a5cd4e 0%,#6b8f1a 100%); 
+background: -ms-linear-gradient(top, #a5cd4e 0%,#6b8f1a 100%); 
+background: linear-gradient(top, #a5cd4e 0%,#6b8f1a 100%); 
+}
+.accordion > li:hover > a span,
+.accordion > li:target > a span {
+    color:#fdfdfd;
+    text-shadow: 0px 1px 0px rgba(0,0,0, 0.35);
+    background: #3e5706;
+}
+.sub-menu li:hover a { background: #efefef; } 
+/* 控制子菜单的显示与隐藏 
+为了隐藏子菜单，需要定义子菜单高度为0px,
+当点击父菜单时，为子菜单添加下滑显示的动态效果
+为了实现下滑效果，需要指定子菜单固定的高度
+如果添加更多子菜单，需要修改height为所有子菜单的高度和，
+如果想自动变化，可以给高度赋值100% ，单就没有了下滑的动画s
+*/
+.accordion li > .sub-menu {
+    height: 0;
+    overflow: hidden;
+    transition: all .2s ease-in-out;
+}
+.accordion li:target > .sub-menu {
+    height:170px;
+    /* height: 100%; */
+}
+</style>
+</head>
+<body>
+   <ul class="accordion" style="width:200px;">
+       <li id="one" class="files"><a href="#one">我的文件<span>495</span></a>
+         <ul class='sub-menu'>
+             <li><a href="javascript:void(0)"><em>01</em>音乐</a><sapn>42</sapn></li>
+             <li><a href="javascript:void(0)"><em>02</em>视频</a><sapn>42</sapn></li>
+             <li><a href="javascript:void(0)"><em>03</em>图片</a><sapn>42</sapn></li>
+         </ul>
+       </li>
+       <li id="two" class="mail"><a href="#two">邮件<span>25</span></a>
+        <ul class='sub-menu'>
+                <li><a href="javascript:void(0)"><em>01</em>音乐</a><sapn>42</sapn></li>
+                <li><a href="javascript:void(0)"><em>02</em>视频</a><sapn>42</sapn></li>
+                <li><a href="javascript:void(0)"><em>03</em>图片</a><sapn>42</sapn></li>
+            </ul>
+    </li>
+       <li id="three" class="cluod"><a href="#three">网盘<span>95</span></a>
+        <ul class='sub-menu'>
+                <li><a href="javascript:void(0)"><em>01</em>音乐</a><sapn>42</sapn></li>
+                <li><a href="javascript:void(0)"><em>02</em>视频</a><sapn>42</sapn></li>
+                <li><a href="javascript:void(0)"><em>03</em>图片</a><sapn>42</sapn></li>
+            </ul>
+    
+    </li>
+       <li id="four" class="sign"><a href="#four">退出登录<span>45</span></a>
+    
+        <ul class='sub-menu'>
+                <li><a href="javascript:void(0)"><em>01</em>音乐</a><sapn>442</sapn></li>
+                <li><a href="javascript:void(0)"><em>02</em>视频</a><sapn>4sa</sapn></li>
+                <li><a href="javascript:void(0)"><em>03</em>图片</a><sapn>42wer</sapn></li>
+            </ul>
+        </li>
+   </ul>
+</body>
+</html>
