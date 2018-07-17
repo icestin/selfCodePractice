@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>iframe子页面</title>
+</head>
+<body>
+    <div style="height: 400px; width: 300px;">
+        <button onclick="sendData()"> 向主窗体中发送数据</button>
+    </div>
+    <script>
+       window.onload = function() {
+           load();
+       }
+      function sendData () {
+          window.parent.postMessage("来自子窗体数据", "*");
+      }
+    //   window.addEventListener('message', function(e) {
+    //       console.log('子窗体中，来自主窗体的信息', e, e.data);
+    //   })
+
+    function load () {
+        // 仅限主域相同，子域不同
+        document.domain = "192.168.6.150";
+        console.log("来自父窗体的:",window.parent.user)
+    }
+    </script>
+</body>
+</html>

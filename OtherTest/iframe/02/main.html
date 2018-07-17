@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>主页面与iframe页面内容通讯</title>
+</head>
+<body>
+    
+    <h2>主页面内容</h2>
+    <iframe src="http://192.168.6.150:8080/child.html" height="500px" width="300px">
+    </iframe>
+    <button onclick="sendData()"> 发送数据</button>
+    <div> 
+        <textarea id ="result"></textarea>
+    </div>
+    <script>
+    window.onload =  function () {
+        window.addEventListener('message', function(e) {
+          console.log('主窗体中，来子窗体的信息', e, e.data);
+      })
+
+    
+    }
+    // 仅限主域相同，子域不同
+    document.domain = "192.168.6.150";
+    var user = {
+        a: "xiaoming",
+        b: "小黄"
+    }
+    
+    function sendData() {
+        var ifr = document.querySelector('iframe');
+        ifr.contentWindow.postMessage(Date.now(),"*");
+    }
+    </script>
+</body>
+</html>

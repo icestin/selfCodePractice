@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>元素水平居中方法</title>
+</head>
+<body>
+    <div class="normal">行内元素居中
+
+     <div style="text-align: center">
+         <a href="#" >行内元素居中 </a>
+     </div>
+    </div>
+    <div class="normal"> <div style="margin: 0 auto; width:200px;background-color:red">
+        定宽块 块元素 左右margin auto
+    </div></div>
+    <div class="normal" style='text-align: center;'>
+       <div style='display: inline'>不定宽 块元素  </div> </div>
+       <div style='display:flex; justify-content:center;background-color:red'>
+           通用方案， flex布局 对父元素设置display:flex;justify-content:center;
+       </div>
+</body>
+</html>
